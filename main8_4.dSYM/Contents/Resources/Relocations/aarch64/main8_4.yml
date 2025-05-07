@@ -1,0 +1,5 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     '/Users/dschur/EE259_Work/pro_8/main8_4'
+relocations:     []
+...
