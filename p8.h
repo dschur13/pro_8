@@ -163,30 +163,85 @@ EZ_DIFF_INTEGRATE::EZ_DIFF_INTEGRATE(char * in_fn)
 void
 EZ_DIFF_INTEGRATE::EZ_DIFF_BY_ME(float a , float b, int n)
 {
-	int i, coeff;
-	float x_new, x_old;
+
+//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+    // first we need to produce our x values for our functions
+    // we will find the difference between a and b, divide by the number of points
+    //that gives us the distance between points, h.
+    // use a as our starting point, a + h is point two, a + 2h is point 3...etc
+	int i, j;
+	float h = (b -a)/n;
 	float x[30]; // x coordinate;
 	float df[30]; // first derivative;
-	
-	if (strcmp(func_type,"sin") == 0)
-	{
-        x_new = a; 
-        coeff = (b - a)/(2 * n);
+    float f_val[30]; //the value of f(x) at different points aka y coordinate
+    int min_count, max_count;
         
-        for(i=0; i <= n; i++)
+
+    for(i=0; i <= n; i++)
+    {
+        x[i] = a + i * h;
+
+        if(strcmp(func_type, "sin") == 0)
         {
-            //float
+            f_val[i] = 1.0;
+            //f_val[i] = 0.0;
+            for (j = 0; j < exp; j++)
+            {
+                f_val[i] *= sin(arg * x[i]);
+            }
         }
-		// your code to compute differentiation for sin:
 
-	}
-	else if (strcmp(func_type,"cos") == 0)
-	{
-		// your code to compute differentiation for cos:
+        else if (strcmp(func_type, "cos") == 0)
+        {
+            f_val[i] = 1.0;
+            for (j = 0; j < exp; j++)
+            {
+                f_val[i] *= cos(arg * x[i]);
+            }
+        }
 
-	}
+        else
+        {
+            f_val[i] = 0;
+        }
+    }
+//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+// now we calculate the actual derivatives using central difference method since
+// it's more accurate than backwards difference, and also same amount of efforts
+    for (i = 1; i < n; i++)
+    {
+        df[i] = ((f_val[i +1] - f_val[i-1]) / (2*h));
+    }
+    df[0] = ((f_val[1] - f_val[0]) / h); // this is the forward difference
+    df[n] = ((f_val[n] - f_val[n-1])/h); // this is the backward difference once at the end
 
-	// report extreme points:
+//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+// now we find the mins and maxs
+
+for (i = 0; i < n; i++)
+{
+    if ((df[i] > 0 && df[i + 1] < 0) || (df[i] < 0 && df[i + 1] > 0))
+    {
+        o_f_8 << "*** THERE IS AN EXTREME POINT*** df[" << i << "]: " << df[i]
+        << "\tdf[" << i+1 << "]: " << df[i+1] << endl;
+ 
+
+        if (df[i] > 0 && df[i + 1] < 0)
+        {
+            max_count++;
+        }
+        else if (df[i] < 0 && df[i + 1] > 0)
+        {
+            min_count++;
+        }
+    }
+}
+
+o_f_8 << "THERE ARE " << min_count << " MINIMUMS AND "
+      << max_count << " MAXIMUMS FOR THIS " << func_type
+      << " FUNCTION IN THE INTERVAL OF " << a
+      << " AND " << b << " WITH " << n << " POINTS." << endl;
+
 
 }
 
